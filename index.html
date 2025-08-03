@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+<title>BTCL LLI Bill Calculator</title>
+<img src="D:\btcl logo.png" width="100" height="100"> </img>  
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f3f6fa;
+        margin: 0;
+        padding: 0;
+    }
+    h2 { 
+        color: #2c3e50; 
+        text-align: center;
+        padding: 20px;
+    }
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+    .left-panel, .right-panel {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    }
+    .btn-group button {
+        background-color: #3498db;
+        border: none;
+        color: white;
+        padding: 10px 18px;
+        margin: 5px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .btn-group button.active {
+        background-color: #27ae60;
+    }
+    .input-box {
+        margin-top: 15px;
+    }
+    .bandwidth-boxes {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+        gap: 10px;
+    }
+    .box {
+        background: #ecf0f1;
+        border-radius: 10px;
+        padding: 15px;
+        width: 120px;
+        text-align: center;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+    .box h3 { margin: 5px 0; color: #2c3e50; font-size: 14px; }
+    .box p { margin: 0; font-weight: bold; color: #16a085; }
+    .result-box {
+        margin-top: 10px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+    }
+    .highlight {
+        color: red;
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    hr { border: 1px solid #ddd; margin: 15px 0; }
+</style>
+</head>
+<body>
+<h1> Bangladesh Telecommunications Company Limited  </h1><br> 
+
+<h2>📡 BTCL LLI Bill Calculator</h2>
+
+<div class="container">
+
+    <!-- ✅ বামপাশের ইনপুট প্যানেল -->
+    <div class="left-panel">
+        <h3>গ্রাহক শ্রেণি নির্বাচন করুন</h3>
+        <div class="btn-group" id="customerType">
+            <button onclick="selectCustomer('ISP', this)">আইএসপি</button>
+            <button onclick="selectCustomer('IIG', this)">আইআইজি</button>
+            <button onclick="selectCustomer('Education', this)">শিক্ষা প্রতিষ্ঠান</button>
+            <button onclick="selectCustomer('Govt', this)">সরকারি ও কর্পোরেট</button>
+        </div>
+
+        <h3>লোকেশন নির্বাচন করুন</h3>
+        <div class="btn-group" id="locationType">
+            <button onclick="selectLocation('Dhaka', this)">ঢাকা/চট্টগ্রাম জেলার মধ্যে</button>
+            <button onclick="selectLocation('Outside', this)">ঢাকা/চট্টগ্রামের বাইরে</button>
+        </div>
+
+        <h3>চাহিত ব্যান্ডউইথ (Mbps)</h3>
+        <div class="input-box">
+            <input type="number" id="bandwidth" placeholder="যেমন: 50" oninput="calculateBandwidth()" style="padding:10px; width:120px;">
+        </div>
+
+        <div class="bandwidth-boxes">
+            <div class="box">
+                <h3>মূল ব্যান্ডউইথ</h3>
+                <p id="mainBW">0 Mbps</p>
+            </div>
+            <div class="box">
+                <h3>বাফার (৪০%)</h3>
+                <p id="bufferBW">0 Mbps</p>
+            </div>
+            <div class="box">
+                <h3>মোট প্রাপ্য</h3>
+                <p id="totalBW">0 Mbps</p>
+            </div>
+        </div>
+
+        <!-- ✅ চুক্তি অপশন -->
+        <div id="contractOption" style="display:none; margin-top:20px;">
+            <h3 id="contractText"></h3>
+            <div class="btn-group" id="contractButtons">
+                <button onclick="selectContract('Yes', this)">হ্যাঁ</button>
+                <button onclick="selectContract('No', this)">না</button>
+            </div>
+        </div>
+
+        <!-- ✅ সরকারি সংস্থা? -->
+        <h3 style="margin-top:20px;">সরকারি/আধা-সরকারি/স্বায়ত্তশাসিত সংস্থা?</h3>
+        <div class="btn-group" id="govtType">
+            <button onclick="selectGovt('Yes', this)">হ্যাঁ</button>
+            <button onclick="selectGovt('No', this)">না</button>
+        </div>
+    </div>
+
+    <!-- ✅ ডানপাশের ক্যালকুলেশন প্যানেল -->
+    <div class="right-panel">
+        <h3>📄 মাসিক বিল ক্যালকুলেশন</h3>
+        <div class="result-box">
+            <p id="calculation">👉 বাম পাশ থেকে সব তথ্য পূরণ করুন</p>
+        </div>
+
+        <h3>📑 অন্যান্য বিল ও শর্তাবলী</h3>
+        <div class="result-box">
+            <p id="otherCharges">👉 সব তথ্য পূরণ হলে এখানে দেখাবে</p>
+        </div>
+    </div>
+</div>
+
+<script>
+let customerType = "";
+let locationType = "";
+let contract = "No";
+let govt = "No";
+let bufferBW = 0;
+let totalBW = 0;
+let totalBill = 0;
+
+function selectCustomer(type, btn){
+    customerType = type;
+    setActive(btn, 'customerType');
+
+    // ✅ ISP হলে ৩ বছরের চুক্তি, IIG হলে ২ বছরের চুক্তি
+    let contractBox = document.getElementById('contractOption');
+    let text = document.getElementById('contractText');
+    if(type === 'ISP'){
+        contractBox.style.display = 'block';
+        text.innerText = "আপনি কি ৩ বছর মেয়াদি চুক্তি করতে চান? (৫% ডিসকাউন্ট)";
+    } else if(type === 'IIG'){
+        contractBox.style.display = 'block';
+        text.innerText = "আপনি কি ২ বছর মেয়াদি চুক্তি করতে চান? (৫% ডিসকাউন্ট)";
+    } else {
+        contractBox.style.display = 'none';
+        contract = "No";
+    }
+    calculateBill();
+}
+
+function selectLocation(type, btn){
+    locationType = type;
+    setActive(btn, 'locationType');
+    calculateBill();
+}
+
+function selectContract(choice, btn){
+    contract = choice;
+    setActive(btn, 'contractButtons');
+    calculateBill();
+}
+
+function selectGovt(choice, btn){
+    govt = choice;
+    setActive(btn, 'govtType');
+    calculateBill();
+}
+
+function setActive(btn, groupId){
+    let buttons = document.getElementById(groupId).getElementsByTagName('button');
+    for(let b of buttons){ b.classList.remove('active'); }
+    btn.classList.add('active');
+}
+
+function calculateBandwidth(){
+    let bw = parseFloat(document.getElementById('bandwidth').value) || 0;
+    bufferBW = bw * 0.40;
+    totalBW = bw + bufferBW;
+
+    document.getElementById('mainBW').innerText = bw + " Mbps";
+    document.getElementById('bufferBW').innerText = bufferBW.toFixed(1) + " Mbps";
+    document.getElementById('totalBW').innerText = totalBW.toFixed(1) + " Mbps";
+
+    calculateBill();
+}
+
+function calculateBill(){
+    let bw = parseFloat(document.getElementById('bandwidth').value) || 0;
+    if(bw <= 0 || customerType==="" || locationType===""){
+        document.getElementById('calculation').innerText = "👉 বাম পাশ থেকে সব তথ্য পূরণ করুন";
+        document.getElementById('otherCharges').innerText = "👉 সব তথ্য পূরণ হলে এখানে দেখাবে";
+        return;
+    }
+
+    // ✅ প্রতি Mbps এর দাম নির্ধারণ
+    let pricePerMbps = 0;
+    if(bw >= 10 && bw <= 99){
+        if(customerType==='ISP') pricePerMbps=250;
+        else if(customerType==='IIG') pricePerMbps=220;
+        else if(customerType==='Education') pricePerMbps=200;
+        else if(customerType==='Govt') pricePerMbps=240;
+    } else if(bw >= 100 && bw <= 499){
+        if(customerType==='ISP') pricePerMbps=245;
+        else if(customerType==='IIG') pricePerMbps=215;
+        else if(customerType==='Education') pricePerMbps=180;
+        else if(customerType==='Govt') pricePerMbps=220;
+    }
+
+    // ✅ মাসিক বেস মূল্য
+    let basePrice = bw * pricePerMbps;
+
+    // ✅ চুক্তি করলে ৫% ডিসকাউন্ট
+    let contractDiscount = (contract==='Yes') ? basePrice * 0.05 : 0;
+
+    // ✅ লোকেশন ডিসকাউন্ট (ঢাকা বা চট্টগ্রাম হলে ১০%)
+    let locationDiscount = (locationType==='Dhaka') ? basePrice * 0.10 : 0;
+
+    // ✅ মাসিক মোট বিল
+    totalBill = basePrice - contractDiscount - locationDiscount;
+
+    // ✅ প্রতি Mbps এর কার্যকর দাম (বাফারসহ)
+    let effectivePricePerMbps = totalBill / totalBW;
+
+    // ✅ মাসিক বিল সেকশন
+    document.getElementById('calculation').innerHTML = `
+        🔹 চাহিত ব্যান্ডউইথের বেস মূল্য = ${bw} × ${pricePerMbps} = <b>${basePrice} টাকা</b><br>
+        🔹 চুক্তি ডিসকাউন্ট (৫%) = <b>${contractDiscount.toFixed(2)} টাকা</b><br>
+        🔹 লোকেশন ডিসকাউন্ট (১০%) = <b>${locationDiscount.toFixed(2)} টাকা</b><br><hr>
+        ✅ <span class="highlight">মোট মাসিক বিল ${totalBill.toFixed(2)} টাকা</span><br><br>
+        📌 মোট প্রাপ্য ব্যান্ডউইথ = ${totalBW.toFixed(1)} Mbps (বাফারসহ)<br>
+        📌  আপনি পাচ্ছেন= ${effectivePricePerMbps.toFixed(2)} টাকা / Mbps
+    `;
+
+    // ✅ অন্যান্য বিল হিসাব
+    let connectionFee = 5000; // সবার জন্য
+    let securityDeposit = (govt === 'Yes') ? 0 : totalBill; // সরকারি হলে 0, না হলে ১ মাসের বিল
+    let advance = totalBill; // ১ মাসের অগ্রিম
+    let otherTotal = connectionFee + securityDeposit + advance;
+
+    document.getElementById('otherCharges').innerHTML = `
+        সংযোগ ফি = <b>${connectionFee} টাকা</b><br>
+        জামানত = <b>${securityDeposit.toFixed(2)} টাকা</b><br>
+        অগ্রিম (১ মাসের বিল) = <b>${advance.toFixed(2)} টাকা</b><br><hr>
+        ✅ <span class="highlight">অন্যান্য চার্জ মোট = ${otherTotal.toFixed(2)} টাকা</span>
+    `;
+}
+</script>
+
+</body>
+</html>
